@@ -33,17 +33,17 @@ def solved_problem_set(soup):
 
 def get_sol_id(newsoup):
 	for tr in newsoup.find_all('tr'):
-		check=tr.find('td', class_='statusres text-center')
-		if check['status']==15:
-			td=tr.find('td', class_='statustext text-center').a.text
-			return td
+		check = tr.find('td', class_='statusres text-center')
+		if check != None and check['status'] == 15:
+			acid = tr.find('td', class_='statustext').text
+			return acid.strip()
 
 def get_ac_lang(newsoup):
 	for tr in newsoup.find_all('tr'):
-		check=tr.find('td', class_='statusres text-center')
-		if check['status']==15:
-			td=tr.find('td', class_='slang text-center').a.text
-			return td 
+		check = tr.find('td', class_='statusres text-center')
+		if check != None and check['status'] == 15:
+			aclang=tr.find('td', class_='slang').find('span').text
+			return aclang.strip()
 
 if __name__ == '__main__':
 	username = raw_input("Enter username : ")
@@ -52,13 +52,14 @@ if __name__ == '__main__':
 		myacc=session.get('https://www.spoj.com/myaccount')
 		soup=BeautifulSoup(myacc.text, "lxml")
 		solved_problems=solved_problem_set(soup)
+		print(solved_problems)
 		for problem in solved_problems:
-			probstatus="https://www.spoj.com/status/"+problem+","+username
+			probstatus=session.get("https://www.spoj.com/status/"+problem+","+username)
 			newsoup=BeautifulSoup(probstatus.text, "lxml")
 			print (problem+" : \n")
 			acid=get_sol_id(newsoup)
 			aclang=get_ac_lang(newsoup)
-			filename=problem+lang[aclang]
+			filename = problem + lang[aclang]
 			print ("Downloading "+filename+" ...\n")
 			with open(filename, "w") as solution:
 				solution.write(session.get('https://www.spoj.com/files/src/save/{sol_id}'.format(sol_id=acid)).text)
