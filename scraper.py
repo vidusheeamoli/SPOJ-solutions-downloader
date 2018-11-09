@@ -34,14 +34,14 @@ def solved_problem_set(soup):
 def get_sol_id(newsoup):
 	for tr in newsoup.find_all('tr'):
 		check = tr.find('td', class_='statusres text-center')
-		if check != None and check['status'] == 15:
+		if check != None and check['status'] == '15':
 			acid = tr.find('td', class_='statustext').text
 			return acid.strip()
 
 def get_ac_lang(newsoup):
 	for tr in newsoup.find_all('tr'):
 		check = tr.find('td', class_='statusres text-center')
-		if check != None and check['status'] == 15:
+		if check != None and check['status'] == '15':
 			aclang=tr.find('td', class_='slang').find('span').text
 			return aclang.strip()
 
