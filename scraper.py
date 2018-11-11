@@ -4,11 +4,18 @@ import lxml
 from contextlib import contextmanager
 from getpass import getpass
 import sqlite3
+import csv
+
+
+
+csv_file = open('problems.csv', 'w')
+csv_writer = csv.writer(csv_file)
+csv_writer.writerow(['problem_name', 'language_used'])
 
 
 conn = sqlite3.connect('problems.db')
 c=conn.cursor()
-c.execute("""CREATE TABLE prob1 (
+c.execute("""CREATE TABLE IF NOT EXISTS prob1 (
 problem_name varchar2,
 language_used varchar2
 )""")
@@ -57,33 +64,55 @@ def get_ac_lang(newsoup):
 if __name__ == '__main__':
 	username = raw_input("Enter username : ")
 	password = getpass("Enter password : ")
-	with login(username, password) as session:
-		myacc=session.get('https://www.spoj.com/myaccount')
-		soup=BeautifulSoup(myacc.text, "lxml")
-		solved_problems=solved_problem_set(soup)
-		print(solved_problems)
-		for problem in solved_problems:
-			probstatus=session.get("https://www.spoj.com/status/"+problem+","+username)
-			newsoup=BeautifulSoup(probstatus.text, "lxml")
-			print (problem+" : \n")
-			acid=get_sol_id(newsoup)
-			aclang=get_ac_lang(newsoup)
-			filename = problem + lang[aclang]
+	print("\n")
+	check = raw_input("Download solutions ? (yes/y OR no/n) : ")
+	print("\n")
 
-			#### for database containing all problems solved and language used
-			temp=""
-			langused=""
-			langused=aclang
-			temp=problem
-			c.execute("INSERT INTO prob1 VALUES (?, ?)", (temp, langused))
-			conn.commit()
-			####
+	if(check == "no" or check == 'n' or check == 'N' or check == 'NO'):
+		with login(username, password) as session:
+			myacc=session.get('https://www.spoj.com/myaccount')
+			soup=BeautifulSoup(myacc.text, "lxml")
+			solved_problems=solved_problem_set(soup)
+			print(solved_problems)
+			for problem in solved_problems:
+				probstatus=session.get("https://www.spoj.com/status/"+problem+","+username)
+				newsoup=BeautifulSoup(probstatus.text, "lxml")
+				print (problem+" : \n")
+				acid=get_sol_id(newsoup)
+				aclang=get_ac_lang(newsoup)
+				filename = problem + lang[aclang]
+				temp=""
+				langused=""
+				langused=aclang
+				temp=problem
+				csv_writer.writerow([temp, langused])
+				c.execute("INSERT INTO prob1 VALUES (?, ?)", (temp, langused))
+				conn.commit()
+	else:
+		with login(username, password) as session:
+			myacc=session.get('https://www.spoj.com/myaccount')
+			soup=BeautifulSoup(myacc.text, "lxml")
+			solved_problems=solved_problem_set(soup)
+			print(solved_problems)
+			for problem in solved_problems:
+				probstatus=session.get("https://www.spoj.com/status/"+problem+","+username)
+				newsoup=BeautifulSoup(probstatus.text, "lxml")
+				print (problem+" : \n")
+				acid=get_sol_id(newsoup)
+				aclang=get_ac_lang(newsoup)
+				filename = problem + lang[aclang]
+				temp=""
+				langused=""
+				langused=aclang
+				temp=problem
+				csv_writer.writerow([temp, langused])
+				c.execute("INSERT INTO prob1 VALUES (?, ?)", (temp, langused))
+				conn.commit()
+				print ("Downloading "+filename+" ...\n")
+				with open(filename, "w") as solution:
+					solution.write(session.get('https://www.spoj.com/files/src/save/{sol_id}'.format(sol_id=acid)).text)
 
-			#print ("Downloading "+filename+" ...\n")
-			#with open(filename, "w") as solution:
-				#solution.write(session.get('https://www.spoj.com/files/src/save/{sol_id}'.format(sol_id=acid)).text)
 
-		
-
+	csv_file.close()
 	c.execute("SELECT * from prob1")
 	print(c.fetchall())
