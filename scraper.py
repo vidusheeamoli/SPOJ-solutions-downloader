@@ -3,6 +3,15 @@ import requests
 import lxml  
 from contextlib import contextmanager
 from getpass import getpass
+import sqlite3
+
+
+conn = sqlite3.connect('problems.db')
+c=conn.cursor()
+c.execute("""CREATE TABLE prob1 (
+problem_name varchar2,
+language_used varchar2
+)""")
 
 lang = {'C': '.c', 'C++': '.cpp', 'CPP14': '.cpp', 'JAVA': '.java',
 		'PYTHON3': '.py', 'PYPY': '.py', 'C++ 4.3.2': '.cpp', 'CPP': '.cpp',
@@ -60,8 +69,21 @@ if __name__ == '__main__':
 			acid=get_sol_id(newsoup)
 			aclang=get_ac_lang(newsoup)
 			filename = problem + lang[aclang]
-			print ("Downloading "+filename+" ...\n")
-			with open(filename, "w") as solution:
-				solution.write(session.get('https://www.spoj.com/files/src/save/{sol_id}'.format(sol_id=acid)).text)
+
+			#### for database containing all problems solved and language used
+			temp=""
+			langused=""
+			langused=aclang
+			temp=problem
+			c.execute("INSERT INTO prob1 VALUES (?, ?)", (temp, langused))
+			conn.commit()
+			####
+
+			#print ("Downloading "+filename+" ...\n")
+			#with open(filename, "w") as solution:
+				#solution.write(session.get('https://www.spoj.com/files/src/save/{sol_id}'.format(sol_id=acid)).text)
 
 		
+
+	c.execute("SELECT * from prob1")
+	print(c.fetchall())
