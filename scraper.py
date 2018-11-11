@@ -62,7 +62,9 @@ def get_ac_lang(newsoup):
 			return aclang.strip()
 
 if __name__ == '__main__':
+	print("\n")
 	username = raw_input("Enter username : ")
+	print("\n")
 	password = getpass("Enter password : ")
 	print("\n")
 	check = raw_input("Download solutions ? (yes/y OR no/n) : ")
@@ -73,7 +75,7 @@ if __name__ == '__main__':
 			myacc=session.get('https://www.spoj.com/myaccount')
 			soup=BeautifulSoup(myacc.text, "lxml")
 			solved_problems=solved_problem_set(soup)
-			print(solved_problems)
+			#print(solved_problems)
 			for problem in solved_problems:
 				probstatus=session.get("https://www.spoj.com/status/"+problem+","+username)
 				newsoup=BeautifulSoup(probstatus.text, "lxml")
@@ -93,7 +95,7 @@ if __name__ == '__main__':
 			myacc=session.get('https://www.spoj.com/myaccount')
 			soup=BeautifulSoup(myacc.text, "lxml")
 			solved_problems=solved_problem_set(soup)
-			print(solved_problems)
+			#print(solved_problems)
 			for problem in solved_problems:
 				probstatus=session.get("https://www.spoj.com/status/"+problem+","+username)
 				newsoup=BeautifulSoup(probstatus.text, "lxml")
