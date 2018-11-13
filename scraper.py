@@ -62,14 +62,9 @@ def get_ac_lang(newsoup):
 			return aclang.strip()
 
 if __name__ == '__main__':
-	print("\n")
 	username = raw_input("Enter username : ")
-	print("\n")
 	password = getpass("Enter password : ")
-	print("\n")
 	check = raw_input("Download solutions ? (yes/y OR no/n) : ")
-	print("\n")
-
 	if(check == "no" or check == 'n' or check == 'N' or check == 'NO'):
 		with login(username, password) as session:
 			myacc=session.get('https://www.spoj.com/myaccount')
