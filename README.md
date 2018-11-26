@@ -11,5 +11,5 @@ $ pip install -r requirements.txt
 ### How to run it
 
 ```
-$ python ./scraper.py
+$ python scraper.py
 ```
